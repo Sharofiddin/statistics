@@ -54,8 +54,9 @@ kruskalWallisRank samples = groupByTags
 
 -- | The Kruskal-Wallis Test.
 --
--- In textbooks the output value is usually represented by 'K' or 'H'. This
--- function already does the ranking.
+-- In textbooks the output value is usually represented by 'K' or
+-- 'H'. This function already does the ranking. This function returns
+-- NaN in case when all values in sample are identical.
 kruskalWallis :: (U.Unbox a, Ord a) => [U.Vector a] -> Double
 kruskalWallis samples = (nTot - 1) * numerator / denominator
   where
@@ -77,11 +78,16 @@ kruskalWallis samples = (nTot - 1) * numerator / denominator
 -- significance. For additional information check 'kruskalWallis'. This is just
 -- a helper function.
 --
--- It uses /Chi-Squared/ distribution for approximation as long as the sizes are
--- larger than 5. Otherwise the test returns 'Nothing'.
+-- It uses /Chi-Squared/ distribution for approximation as long as the
+-- sizes are larger than 5. Otherwise the test returns 'Nothing'. In
+-- case when all elements in all samples are identical test value
+-- couldn't be computed and @Nothing@ is returned.
 kruskalWallisTest :: (Ord a, U.Unbox a) => [U.Vector a] -> Maybe (Test ())
 kruskalWallisTest []      = Nothing
+kruskalWallisTest [_]     = Nothing
 kruskalWallisTest samples
+  -- NaN is returned when all values in all samples are identical.
+  | isNaN k     =  Nothing
   -- We use chi-squared approximation here
   | all (>4) ns = Just Test { testSignificance = mkPValue $ complCumulative d k
                             , testStatistics   = k
