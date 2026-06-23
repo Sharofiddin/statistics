@@ -157,7 +157,8 @@ test-suite statistics-tests
   main-is:        tests.hs
   other-modules:
     Tests.ApproxEq
-    Tests.Correlation
+    Tests.Correlation  
+    Tests.CorrelationErr
     Tests.Distribution
     Tests.ExactDistribution
     Tests.Function
